@@ -1,5 +1,5 @@
 import logging
-from config import LOG_PATH
+from app.config import LOG_PATH
 def setup_logger():
     logger=logging.getLogger("DeepFakeAudioDetector")
     logger.setLevel(logging.INFO)
