@@ -1,6 +1,6 @@
 import librosa
 import numpy as np
-from config import SAMPLE_RATE,MAX_PAD_LEN
+from app.config import SAMPLE_RATE,MAX_PAD_LEN
 def load_audio(file_path):
     audio,sr=librosa.load(file_path,sr=SAMPLE_RATE)
     return audio,sr
