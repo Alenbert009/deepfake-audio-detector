@@ -1,14 +1,20 @@
 import logging
+import os
 from app.config import LOG_PATH
 def setup_logger():
-    logger=logging.getLogger("DeepFakeAudioDetector")
-    logger.setLevel(logging.INFO)
-    file_handler=logging.FileHandler(LOG_PATH)
-    formatter=logging.Formatter(
-        "%(asctime)s - %(levelname)s - %(message)s"
-    )
-    file_handler.setFormatter(formatter)
-    if not logger.handlers:
-        logger.addHandler(file_handler)
-        
+    os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+    logger = logging.getLogger("app_logger")
+
+    if not logger.handlers:  # 🔥 prevents duplicate handlers
+        logger.setLevel(logging.INFO)
+
+        console_handler = logging.StreamHandler()
+
+        formatter = logging.Formatter(
+            "%(asctime)s - %(levelname)s - %(message)s"
+        )
+        console_handler.setFormatter(formatter)
+
+        logger.addHandler(console_handler)
+
     return logger

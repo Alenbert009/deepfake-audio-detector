@@ -1,6 +1,10 @@
 import librosa
 import numpy as np
-from app.config import SAMPLE_RATE,MAX_PAD_LEN
+from app.config import (
+ SAMPLE_RATE,
+ MAX_PAD_LEN
+)
+
 def load_audio(file_path):
     audio,sr=librosa.load(file_path,sr=SAMPLE_RATE)
     return audio,sr
@@ -15,6 +19,49 @@ def extract_spectrogram(file_path):
         spec_db = spec_db[:128, :128]
     spec_db = spec_db / (np.max(np.abs(spec_db)) + 1e-6)
     return spec_db[...,np.newaxis]
+def extract_visual_spectrogram(file_path):
+    """
+    Extract Mel Spectrogram for visualization.
+
+    This is separate from extract_spectrogram()
+    because we want the 2D spectrogram for plotting.
+    """
+
+    audio, sr = load_audio(file_path)
+
+    spectrogram = librosa.feature.melspectrogram(
+        y=audio,
+        sr=sr
+    )
+
+    spectrogram_db = librosa.power_to_db(
+        spectrogram,
+        ref=np.max
+    )
+
+    if spectrogram_db.shape[1] < MAX_PAD_LEN:
+
+        pad_width = (
+            MAX_PAD_LEN -
+            spectrogram_db.shape[1]
+        )
+
+        spectrogram_db = np.pad(
+            spectrogram_db,
+            (
+                (0, 0),
+                (0, pad_width)
+            ),
+            mode="constant"
+        )
+
+    else:
+
+        spectrogram_db = (
+            spectrogram_db[:, :MAX_PAD_LEN]
+        )
+
+    return spectrogram_db
 def extract_audio_features(audio,sr):
     #duration-calculate the total length of an audio signal in seconds
     duration=librosa.get_duration(y=audio,sr=sr)
