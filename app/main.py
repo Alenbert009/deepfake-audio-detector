@@ -12,7 +12,13 @@ app = FastAPI()
 # Logger
 logger = setup_logger()
 # Load model once
-model = load_model(MODEL_PATH,compile=False)
+app = FastAPI()
+model = None
+
+@app.on_event("startup")
+def load_model_on_startup():
+    global model
+    model = load_model(MODEL_PATH, compile=False)
 @app.get("/")
 def home():
     return {"message": "Deepfake Audio Detection API is running 🚀"}
