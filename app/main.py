@@ -18,9 +18,13 @@ model = None
 def get_model():
     global model
     if model is None:
-        logger.info("Loading model...")
-        model = load_model(MODEL_PATH, compile=False)
-        logger.info("Model loaded successfully")
+        logger.info(f"Loading model from: {MODEL_PATH}")
+        try:
+            model = load_model(MODEL_PATH, compile=False)
+            logger.info("Model loaded successfully")
+        except Exception as e:
+            logger.error(f"Model loading FAILED: {str(e)}")
+            return None
     return model
 @app.get("/")
 def home():
