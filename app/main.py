@@ -43,6 +43,7 @@ async def predict(file: UploadFile = File(...)):
         spec = np.expand_dims(spec, axis=0)
 
         # Prediction
+        model=get_model()
         prob = model.predict(spec)[0][0]
         prediction = 1 if prob > THRESHOLD else 0
 
