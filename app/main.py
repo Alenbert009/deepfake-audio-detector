@@ -3,7 +3,8 @@ import numpy as np
 import tempfile
 import librosa
 from fastapi import FastAPI, UploadFile, File
-from tensorflow.keras.models import load_model
+import keras
+
 
 from app.utils import extract_spectrogram, load_audio, extract_audio_features
 from app.config import MODEL_PATH, THRESHOLD
@@ -20,11 +21,11 @@ def get_model():
     if model is None:
         logger.info(f"Loading model from: {MODEL_PATH}")
         try:
-            model = load_model(MODEL_PATH, compile=False)
+            model = keras.models.load_model(MODEL_PATH, compile=False)
             logger.info("Model loaded successfully")
         except Exception as e:
-            logger.error(f"Model loading FAILED: {str(e)}")
-            return None
+            logger.error(f"❌ MODEL LOAD FAILED: {str(e)}")
+            raise e   # 🔥 VERY IMPORTANT
     return model
 @app.get("/")
 def home():
@@ -48,6 +49,8 @@ async def predict(file: UploadFile = File(...)):
 
         # Prediction
         model=get_model()
+        if model is None:
+            return {"error": "Model not loaded"}
         prob = model.predict(spec)[0][0]
         prediction = 1 if prob > THRESHOLD else 0
 
