@@ -5,7 +5,7 @@ import librosa
 from fastapi import FastAPI, UploadFile, File
 import keras
 from keras.layers import BatchNormalization
-
+import tensorflow as tf
 from app.utils import extract_spectrogram, load_audio, extract_audio_features
 from app.config import MODEL_PATH, THRESHOLD
 from app.app_logger import setup_logger
@@ -26,10 +26,11 @@ def get_model():
     if model is None:
         logger.info(f"Loading model from: {MODEL_PATH}")
         try:
-            model = keras.models.load_model(MODEL_PATH, compile=False,safe_mode=False)
+            model = tf.keras.models.load_model(MODEL_PATH, compile=False)
             logger.info("Model loaded successfully")
         except Exception as e:
             logger.error(f"❌ MODEL LOAD FAILED: {str(e)}")
+            model=None
             raise e   # 🔥 VERY IMPORTANT
     return model
 @app.get("/")

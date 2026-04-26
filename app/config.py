@@ -1,6 +1,6 @@
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_PATH="model/deepfake_audio_model.keras"
+MODEL_PATH="model/deepfake_audio_model.h5"
 LOG_PATH=os.path.join(BASE_DIR,'logs','app.log')
 THRESHOLD=0.2
 SAMPLE_RATE=22050
