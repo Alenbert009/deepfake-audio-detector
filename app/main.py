@@ -4,7 +4,7 @@ import tempfile
 import librosa
 from fastapi import FastAPI, UploadFile, File
 import keras
-
+from keras.layers import BatchNormalization
 
 from app.utils import extract_spectrogram, load_audio, extract_audio_features
 from app.config import MODEL_PATH, THRESHOLD
@@ -15,13 +15,18 @@ logger = setup_logger()
 # Load model once
 app = FastAPI()
 model = None
-
+def CustomBN(**kwargs):
+    # 🔥 Remove unsupported args
+    kwargs.pop("renorm", None)
+    kwargs.pop("renorm_clipping", None)
+    kwargs.pop("renorm_momentum", None)
+    return BatchNormalization(**kwargs)
 def get_model():
     global model
     if model is None:
         logger.info(f"Loading model from: {MODEL_PATH}")
         try:
-            model = keras.models.load_model(MODEL_PATH, compile=False)
+            model = keras.models.load_model(MODEL_PATH, custom_objects={"BatchNormalization": CustomBN})
             logger.info("Model loaded successfully")
         except Exception as e:
             logger.error(f"❌ MODEL LOAD FAILED: {str(e)}")
