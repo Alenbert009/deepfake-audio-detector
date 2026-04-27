@@ -113,7 +113,15 @@ logger = setup_logger()
 
 # Sidebar
 st.sidebar.title('⚙️ Settings')
+threshold = st.sidebar.slider(
+    "Detection Threshold",
+    min_value=0.1,
+    max_value=0.9,
+    value=0.2,
+    step=0.05
+)
 
+st.sidebar.markdown(f"*Current Threshold:* {threshold}")
 st.title("🎧 Deepfake Audio Detection System")
 st.markdown("Analyze audio and detect whether it's **Real or Fake**")
 
@@ -147,9 +155,10 @@ if uploaded_file:
         st.stop()
 
     # Extract results
-    prediction = result["prediction"]
+  
     prob = result["probability_fake"]
     features = result["features"]
+    prediction = "FAKE" if prob > threshold else "REAL"
 
     logger.info(f"Prediction: {prediction}, Probability: {prob:.4f}")
 
