@@ -34,7 +34,7 @@ from app.app_logger import setup_logger
 # CONFIGURATION
 # =========================================================
 
-API_URL = "https://deepfake-audio-detector-6.onrender.com/"
+API_URL = "https://deepfake-audio-detector-6.onrender.com/predict"
 
 REQUEST_TIMEOUT = 120
 
