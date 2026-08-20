@@ -10,11 +10,11 @@ The application provides an interactive Streamlit frontend and a FastAPI backend
 
 ### 🌐 Streamlit Frontend
 
-👉 **https://deepfake-audio-detector-cnn-sujoy.streamlit.app/**
+👉 **[Add your Streamlit Community Cloud URL here]**
 
 ### ⚡ FastAPI Backend
 
-👉 **https://deepfake-audio-detector-6.onrender.com/**
+👉 **[Add your Render Backend URL here]**
 
 ---
 
@@ -349,4 +349,156 @@ Uploads an audio file and returns the deepfake detection result.
   "threshold": 0.2,
   "risk": "MEDIUM",
   "features": {
-    "duration": 5.42
+    "duration": 5.42,
+    "sample_rate": 22050,
+    "rms": 0.0432,
+    "zcr": 0.0821
+  }
+}
+```
+
+---
+
+# 🎯 Detection Logic
+
+The model produces a probability between `0` and `1`.
+
+```text
+Fake Probability > Threshold → FAKE
+Fake Probability ≤ Threshold → REAL
+```
+
+The current default threshold is:
+
+```text
+0.20
+```
+
+> The threshold can be adjusted in the frontend interface for experimentation and analysis. The actual prediction threshold is determined by the backend model configuration.
+
+---
+
+# ⚠️ Important Testing Note
+
+Live microphone detection depends heavily on audio quality and recording conditions.
+
+For example, playing AI-generated audio through a phone speaker and recording it using another microphone can cause the audio characteristics to change because of:
+
+- Speaker distortion
+- Room acoustics
+- Background noise
+- Microphone characteristics
+- Compression
+- Recording quality
+
+Therefore, an AI-generated audio clip played through a physical speaker may sometimes be classified differently from the original digital audio file.
+
+For best testing results:
+
+1. Test the original audio file directly.
+2. Test multiple REAL audio samples.
+3. Test multiple AI-generated audio samples.
+4. Compare prediction probabilities.
+5. Test microphone recordings separately.
+6. Avoid relying on a single prediction as definitive forensic evidence.
+
+---
+
+# 📊 Model Limitations
+
+This project is intended as a Deep Learning and audio analysis application.
+
+The predictions are probabilistic and depend on:
+
+- Training data quality
+- Dataset diversity
+- Class balance
+- Audio duration
+- Recording environment
+- Noise
+- Compression
+- Speaker characteristics
+- Microphone quality
+- AI voice generation method
+
+The current system should **not be considered forensic-grade evidence**.
+
+---
+
+# 🔮 Future Improvements
+
+- Improve model accuracy using larger and better-balanced datasets
+- Train with more diverse real and synthetic voices
+- Add data augmentation
+- Improve noise robustness
+- Add explainable AI visualizations
+- Support longer and variable-length audio
+- Add model confidence calibration
+- Implement authentication and user history
+- Add database support
+- Add asynchronous batch processing
+- Deploy using Docker
+- Add automated testing and CI/CD
+- Explore advanced architectures such as:
+  - CNN + LSTM
+  - CRNN
+  - Transformer-based audio models
+  - Pre-trained speech representation models
+
+---
+
+# 📸 Screenshots
+
+### 🏠 Main Dashboard
+
+![Application Dashboard](screenshots/home.png)
+
+### 🎵 Single Audio Detection
+
+![Single Audio Detection](screenshots/single_detection.png)
+
+### 📦 Batch Detection
+
+![Batch Detection](screenshots/batch_detection.png)
+
+### 🎙️ Live Microphone Detection
+
+![Live Microphone Detection](screenshots/microphone_detection.png)
+
+### 📄 Detection Report 1st Page
+
+![PDF Detection Report](screenshots/report-1stpage.png)
+
+### 📄 Detection Report 2nd Page
+
+![PDF Detection Report](screenshots/report-2ndpage.png)
+---
+
+# 📜 License
+
+This project is licensed under the MIT License.
+
+---
+
+# 🙌 Acknowledgements
+
+- ASVspoof Dataset
+- TensorFlow
+- Keras
+- Librosa
+- FastAPI
+- Streamlit
+- Render
+- Streamlit Community Cloud
+
+---
+
+# 👨‍💻 Author
+
+**Sujoy Dass**
+
+GitHub: https://github.com/Alenbert009
+
+---
+
+⭐ If you found this project interesting, consider giving the repository a star!
