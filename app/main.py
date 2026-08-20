@@ -3,6 +3,7 @@ import numpy as np
 import tempfile
 import librosa
 from fastapi import FastAPI, UploadFile, File
+from contextlib import asynccontextmanager
 import keras
 from keras.layers import BatchNormalization
 import tensorflow as tf
@@ -14,14 +15,7 @@ from app.utils import (
 from app.config import MODEL_PATH, THRESHOLD
 from app.app_logger import setup_logger
 
-app = FastAPI(
-    title="Deepfake Audio Detection API",
-    description=(
-        "API for detecting whether an uploaded audio file "
-        "is real or AI-generated/fake using a CNN."
-    ),
-    version="1.0.0"
-)
+
 # Logger
 logger = setup_logger()
 # Load model once
@@ -44,6 +38,33 @@ def get_model():
             model=None
             raise e   # 🔥 VERY IMPORTANT
     return model
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    logger.info(
+        "Starting application..."
+    )
+
+    get_model()
+
+    logger.info(
+        "Deepfake model preloaded successfully"
+    )
+
+    yield
+
+    logger.info(
+        "Shutting down application..."
+    )
+app = FastAPI(
+    title="Deepfake Audio Detection API",
+    description=(
+        "API for detecting whether an uploaded audio file "
+        "is real or AI-generated/fake using a CNN."
+    ),
+    version="1.0.0",
+    lifespan=lifespan
+)
 @app.get("/")
 def home():
     return {"message": "Deepfake Audio Detection API is running 🚀"}
