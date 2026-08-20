@@ -1,198 +1,352 @@
 # 🎧 Deepfake Audio Detection System
 
-A Deep Learning-based web application that detects whether an audio clip is **Real or Fake (Deepfake)** using a Convolutional Neural Network (CNN) trained on Mel Spectrogram features.
+A full-stack Deep Learning application for detecting whether an audio clip is **REAL or FAKE (AI-generated / Deepfake)** using a Convolutional Neural Network (CNN) trained on **Mel Spectrogram features**.
+
+The application provides an interactive Streamlit frontend and a FastAPI backend for model inference. Users can analyze individual audio files, process multiple files in batch, or record audio directly from their microphone.
 
 ---
 
 ## 🚀 Live Demo
 
-👉 *(Add your Streamlit link here after deployment)*
+### 🌐 Streamlit Frontend
+
+👉 **[Add your Streamlit Community Cloud URL here]**
+
+### ⚡ FastAPI Backend
+
+👉 **[Add your Render Backend URL here]**
 
 ---
 
-## 📌 Features
+## ✨ Features
 
-* 🎧 Upload audio files (`.wav`, `.mp3`, `.ogg`)
-* 🤖 Detect **Real vs Fake** audio using CNN
-* 📊 Visualize:
+### 🎵 Single Audio Detection
 
-  * Waveform
-  * Mel Spectrogram
-* 📈 Display prediction confidence
-* ⚙️ Adjustable detection threshold
-* 📁 Demo audio support for testing
+- Upload and analyze an individual audio file
+- Supports:
+  - `.wav`
+  - `.mp3`
+  - `.ogg`
+  - `.flac`
+  - `.m4a`
+- Displays audio preview before analysis
+- Predicts whether the audio is **REAL** or **FAKE**
+
+### 📦 Batch Audio Detection
+
+- Upload multiple audio files simultaneously
+- Analyze each file using the CNN model
+- Displays results in a structured table
+- Shows:
+  - File name
+  - Prediction
+  - Confidence
+  - Fake probability
+  - Risk level
+- Download a batch detection PDF report
+
+### 🎙️ Live Microphone Detection
+
+- Record audio directly from the browser microphone
+- Preview recorded audio
+- Send recorded audio to the FastAPI prediction API
+- Perform real-time-style authenticity analysis
+- Visualize the recorded waveform and Mel Spectrogram
+- Download a microphone detection report
+
+### 📊 Model Analysis
+
+For every prediction, the system displays:
+
+- Prediction: **REAL / FAKE**
+- Confidence score
+- Fake probability
+- Real probability
+- Detection threshold
+- Risk level
+
+### 📈 Audio Signal Visualization
+
+- Audio waveform visualization
+- Mel Spectrogram visualization
+- Audio duration
+- Sample rate
+- RMS energy
+- Zero Crossing Rate (ZCR)
+
+### 📄 PDF Report Generation
+
+Generate downloadable PDF reports containing:
+
+- File information
+- Prediction result
+- Confidence
+- Fake and real probabilities
+- Detection threshold
+- Risk level
+- Audio features
+- Waveform visualization
+- Mel Spectrogram visualization
+
+Batch analysis also supports a consolidated PDF detection report.
 
 ---
 
-## 🧠 Model Architecture (CNN)
+# 🧠 Model Architecture
 
-The model uses a **Convolutional Neural Network (CNN)** trained on Mel Spectrogram inputs.
+The detection model is a **Convolutional Neural Network (CNN)** trained using Mel Spectrogram representations of audio signals.
 
-### 🔹 Input
+### 🔹 Input Representation
 
-* Shape: **(128 × 128 × 1)**
+Audio files are converted into Mel Spectrograms and prepared as CNN input.
 
-### 🔹 Architecture
+**Model input shape:**
 
-* Conv2D (16 filters) + BatchNorm + MaxPooling
-* Conv2D (32 filters) + BatchNorm + MaxPooling
-* Conv2D (64 filters) + BatchNorm + MaxPooling
-* Flatten
-* Dense (64) + Dropout
-* Output Layer (Sigmoid)
-
----
-
-## 📊 Model Summary
-
+```text
+(128, 120, 1)
 ```
-Model: "sequential"
 
-Conv2D (16) → (128,128,16)
-BatchNormalization
-MaxPooling2D → (64,64,16)
+The preprocessing pipeline uses:
 
-Conv2D (32) → (64,64,32)
-BatchNormalization
-MaxPooling2D → (32,32,32)
+- Sample Rate: `22050 Hz`
+- Mel Bands: `128`
+- Maximum Spectrogram Length: `120`
 
-Conv2D (64) → (30,30,64)
-BatchNormalization
-MaxPooling2D → (15,15,64)
+Shorter spectrograms are padded, while longer spectrograms are truncated to maintain a consistent model input shape.
 
-Flatten → 14400
-Dense (64) → 921,664 params
+---
+
+## 🏗️ CNN Architecture
+
+The model architecture consists of:
+
+```text
+Input
+   ↓
+Conv2D (16 Filters)
+   ↓
+Batch Normalization
+   ↓
+Max Pooling
+   ↓
+Conv2D (32 Filters)
+   ↓
+Batch Normalization
+   ↓
+Max Pooling
+   ↓
+Conv2D (64 Filters)
+   ↓
+Batch Normalization
+   ↓
+Max Pooling
+   ↓
+Flatten
+   ↓
+Dense (64)
+   ↓
 Dropout
-Dense (1)
+   ↓
+Sigmoid Output Layer
+```
 
-Total Parameters: 945,475
+The output layer produces a probability representing the likelihood that the input audio is classified as **FAKE**.
+
+```text
+Probability > Threshold  → FAKE
+Probability ≤ Threshold  → REAL
 ```
 
 ---
 
-## ⚙️ Tech Stack
+# ⚙️ System Architecture
 
-* Python 🐍
-* Streamlit 🌐
-* TensorFlow / Keras 🤖
-* Librosa 🎧
-* NumPy 📊
-* Matplotlib 📈
+The project uses a frontend-backend architecture.
+
+```text
+                     ┌──────────────────────────┐
+                     │        User Browser      │
+                     └────────────┬─────────────┘
+                                  │
+                                  ▼
+                     ┌──────────────────────────┐
+                     │   Streamlit Frontend     │
+                     │                          │
+                     │ • Single Audio Detection │
+                     │ • Batch Detection        │
+                     │ • Live Microphone        │
+                     │ • Visualizations         │
+                     │ • PDF Reports            │
+                     └────────────┬─────────────┘
+                                  │
+                           HTTP POST /predict
+                                  │
+                                  ▼
+                     ┌──────────────────────────┐
+                     │      FastAPI Backend     │
+                     │                          │
+                     │ • Audio Processing       │
+                     │ • Feature Extraction     │
+                     │ • Model Inference        │
+                     └────────────┬─────────────┘
+                                  │
+                                  ▼
+                     ┌──────────────────────────┐
+                     │      CNN Model           │
+                     │ deepfake_audio_model     │
+                     └──────────────────────────┘
+```
 
 ---
 
-## 📁 Project Structure
+# 🛠️ Tech Stack
 
-```
+## Frontend
+
+- Streamlit
+- Streamlit Microphone Recorder
+- Requests
+- Matplotlib
+
+## Backend
+
+- FastAPI
+- Uvicorn
+
+## Machine Learning
+
+- TensorFlow
+- Keras
+- NumPy
+- Librosa
+
+## Reporting
+
+- ReportLab
+
+## Deployment
+
+- Render — FastAPI Backend
+- Streamlit Community Cloud — Frontend
+- GitHub — Source Code Repository
+
+---
+
+# 📁 Project Structure
+
+```text
 deepfake-audio-detector/
 │
 ├── app/
 │   ├── main.py
+│   ├── streamlit_app.py
 │   ├── utils.py
 │   ├── config.py
 │   ├── app_logger.py
+│   ├── explainability.py
+│   └── report_generator.py
 │
 ├── model/
-│   └── deepfake_audio_model.h5
+│   └── deepfake_audio_model.keras
 │
-├── data/
-│   └── demo/
-│       ├── real/
-│       └── fake/
-│
-├── logs/
-│   └── app.log
+├── audio-samples/
 │
 ├── notebooks/
-│   └── analysis.ipynb
+│   └── audio detection analysis.ipynb
 │
 ├── requirements.txt
 ├── README.md
-└── .gitignore
+├── .gitignore
+└── .python-version
 ```
 
 ---
 
-## ⚙️ Installation & Setup
+# ⚙️ Installation and Local Setup
 
-### 1️⃣ Clone the repository
+## 1️⃣ Clone the Repository
 
-```
-git clone https://github.com/your-username/deepfake-audio-detector.git
+```bash
+git clone https://github.com/Alenbert009/deepfake-audio-detector.git
 cd deepfake-audio-detector
 ```
 
-### 2️⃣ Install dependencies
+---
 
+## 2️⃣ Create a Virtual Environment
+
+### Windows
+
+```bash
+python -m venv .venv
 ```
+
+Activate it:
+
+```bash
+.venv\Scripts\activate
+```
+
+---
+
+## 3️⃣ Install Dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 3️⃣ Run the app
+---
 
+## 4️⃣ Run the FastAPI Backend
+
+```bash
+uvicorn app.main:app --reload
 ```
-streamlit run app/main.py
+
+The backend will run locally at:
+
+```text
+http://127.0.0.1:8000
+```
+
+You can access the API documentation at:
+
+```text
+http://127.0.0.1:8000/docs
 ```
 
 ---
 
-## 🎯 How It Works
+## 5️⃣ Run the Streamlit Frontend
 
-1. Upload an audio file
-2. Audio is converted to a **Mel Spectrogram**
-3. Spectrogram is resized to **128×128**
-4. Passed through CNN model
-5. Output:
+Open another terminal and activate the virtual environment.
 
-   * **0 → Real**
-   * **1 → Fake**
+Then run:
 
----
+```bash
+streamlit run app/streamlit_app.py
+```
 
-## 📊 Model Performance
-
-* Accuracy: ~50% (current version)
-* Observations:
-
-  * Model shows bias toward real audio
-  * Needs better class balancing and tuning
+The Streamlit application will open in your browser.
 
 ---
 
-## 🔮 Future Improvements
+# 🔌 API Endpoint
 
-* Improve accuracy using balanced dataset
-* Use advanced architectures (CNN + LSTM)
-* Real-time audio detection
-* Noise-robust feature extraction
-* Support variable-length audio
+## `POST /predict`
 
----
+Uploads an audio file and returns the deepfake detection result.
 
-## 📸 Screenshots
+### Example Response
 
-*(Add screenshots of your Streamlit UI here)*
-
----
-
-## 📜 License
-
-This project is licensed under the MIT License.
-
----
-
-## 🙌 Acknowledgements
-
-* ASVspoof Dataset
-* Librosa Documentation
-* TensorFlow/Keras
-
----
-
-## 👨‍💻 Author
-
-**Sujoy Dass**
-
----
-
-⭐ If you like this project, consider giving it a star!
+```json
+{
+  "filename": "audio.wav",
+  "prediction": "FAKE",
+  "confidence": 0.67,
+  "probability_fake": 0.67,
+  "probability_real": 0.33,
+  "threshold": 0.2,
+  "risk": "MEDIUM",
+  "features": {
+    "duration": 5.42
