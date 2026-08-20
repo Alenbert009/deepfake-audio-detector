@@ -10,11 +10,11 @@ The application provides an interactive Streamlit frontend and a FastAPI backend
 
 ### 🌐 Streamlit Frontend
 
-👉 **[Add your Streamlit Community Cloud URL here]**
+👉 **[https://deepfake-audio-detector-cnn-sujoy.streamlit.app/]**
 
 ### ⚡ FastAPI Backend
 
-👉 **[Add your Render Backend URL here]**
+👉 **[https://deepfake-audio-detector-6.onrender.com/]**
 
 ---
 
