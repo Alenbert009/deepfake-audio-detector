@@ -1319,7 +1319,7 @@ elif detection_mode == "Live Microphone":
                                         "audio/wav"
                                     )
                                 },
-                                timeout=REQUEST_TIMEOUT
+                                timeout=(30,180)
                             )
 
 
