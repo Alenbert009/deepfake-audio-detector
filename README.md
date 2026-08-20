@@ -467,11 +467,11 @@ The current system should **not be considered forensic-grade evidence**.
 
 ### 📄 Detection Report 1st Page
 
-![PDF Detection Report](screenshots/report-1stpage.png)
+![PDF Detection Report](screenshots/report-2ndpage.png)
 
 ### 📄 Detection Report 2nd Page
 
-![PDF Detection Report](screenshots/report-2ndpage.png)
+![PDF Detection Report](screenshots/report-1stpage.png)
 ---
 
 # 📜 License
