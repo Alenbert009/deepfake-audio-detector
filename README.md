@@ -1,4 +1,4 @@
-# 🎧 Deepfake Audio Detection System
+# 🎧 VoxAuth – AI-Generated Speech Detection System
 
 A full-stack Deep Learning application for detecting whether an audio clip is **REAL or FAKE (AI-generated / Deepfake)** using a Convolutional Neural Network (CNN) trained on **Mel Spectrogram features**.
 
