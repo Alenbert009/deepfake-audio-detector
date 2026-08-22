@@ -748,9 +748,7 @@ if detection_mode == "Single Audio" and uploaded_files: # as uploaded_files is n
             ):
 
                 audio, sr = load_audio(
-                    file_path,
-                    sr=22050,
-                    duration=30
+                    file_path
                 )
 
             # =================================================
