@@ -13,6 +13,7 @@ from report_generator import (
 )
 import tempfile
 from streamlit_mic_recorder import mic_recorder
+import time
 
 # ---------------------------------------------------------
 # PROJECT PATH
@@ -51,8 +52,8 @@ logger = setup_logger()
 # =========================================================
 
 st.set_page_config(
-    page_title="Deepfake Audio Detector",
-    page_icon="🎧",
+    page_title="VoxAuth – AI-Generated Speech Detection System",
+    page_icon="🎙️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -241,10 +242,10 @@ st.markdown(
 """
 <div class="hero">
 <div class="hero-title">
-🎧 DeepFake Audio Intelligence
+🎙️ VoxAuth
 </div>
 <div class="hero-subtitle">
-AI-powered audio authenticity analysis
+AI-Generated Speech Detection System and authenticity analysis
 using CNN-based Mel Spectrogram classification.
 </div>
 <div class="status-pill">
@@ -333,7 +334,7 @@ with st.sidebar:
     st.divider()
 
     st.caption(
-        "Deepfake Audio Detection System"
+        "VoxAuth – AI-Generated Speech Detection System"
     )
 
 
@@ -421,7 +422,7 @@ if detection_mode == "Single Audio" and uploaded_files: # as uploaded_files is n
             # -------------------------------------------------
 
             st.subheader("🤖 AI Analysis")
-
+            api_start_time = time.time()
             with st.spinner(
                 "Analyzing audio with the deepfake detection model..."
             ):
@@ -444,6 +445,12 @@ if detection_mode == "Single Audio" and uploaded_files: # as uploaded_files is n
                             },
                             timeout=REQUEST_TIMEOUT
                         )
+                    api_end_time = time.time()
+                    api_time = api_end_time - api_start_time
+                    st.info(
+                        f"⚡ API response time: "
+                        f"{api_time:.2f} seconds"
+                    )
 
                 except requests.exceptions.Timeout:
 
@@ -735,13 +742,15 @@ if detection_mode == "Single Audio" and uploaded_files: # as uploaded_files is n
             # =================================================
             # LOAD AUDIO FOR VISUALIZATION
             # =================================================
-
+            visualization_start_time = time.time()
             with st.spinner(
                 "Generating audio visualizations..."
             ):
 
                 audio, sr = load_audio(
-                    file_path
+                    file_path,
+                    sr=22050,
+                    duration=30
                 )
 
             # =================================================
@@ -757,10 +766,12 @@ if detection_mode == "Single Audio" and uploaded_files: # as uploaded_files is n
             fig_wave, ax_wave = plt.subplots(
                 figsize=(12, 4)
             )
+            display_audio=audio[::10]
+            display_sr=sr/10
 
             librosa.display.waveshow(
-                audio,
-                sr=sr,
+                display_audio,
+                sr=display_sr,
                 ax=ax_wave,
                 color="#6366f1"
             )
@@ -810,7 +821,10 @@ if detection_mode == "Single Audio" and uploaded_files: # as uploaded_files is n
             mel_spec = librosa.feature.melspectrogram(
                 y=audio,
                 sr=sr,
-                n_mels=128
+                n_mels=64,
+                n_fft=1024,
+                hop_length=512
+
             )
 
             mel_db = librosa.power_to_db(
@@ -868,7 +882,17 @@ if detection_mode == "Single Audio" and uploaded_files: # as uploaded_files is n
             )
 
             plt.close(fig_spec)
+            visualization_end_time = time.time()
 
+            visualization_time = (
+                visualization_end_time -
+                visualization_start_time
+            )
+
+            st.info(
+                f"📊 Visualization time: "
+                f"{visualization_time:.2f} seconds"
+)
             # =================================================
             # INTERPRETATION
             # =================================================
@@ -916,30 +940,36 @@ if detection_mode == "Single Audio" and uploaded_files: # as uploaded_files is n
             st.subheader(
                 "📄Detection Report"
             )
-            base_filename = os.path.splitext(
-                uploaded_file.name
-            )[0]
-            pdf_file = generate_detection_report(
-                filename=file_name,
-                prediction=prediction,
-                confidence=confidence,
-                probability_fake=fake_probability,
-                probability_real=real_probability,
-                threshold=threshold,
-                risk=risk,
-                features=features,
-                waveform_path=waveform_path,
-                spectrogram_path=spectrogram_path,
-            )
-            st.download_button(
-                label="📥 Download Detection Report",
-                data=pdf_file,
-                file_name=(
-                    f"deepfake_detection_"
-                    f"{base_filename}.pdf"
-                ),
-                mime="application/pdf",
-            )
+            if st.button(
+                "Generate PDF Report"
+            ):
+                with st.spinner(
+                    "Generating PDF report..."
+                ):
+                    base_filename = os.path.splitext(
+                        uploaded_file.name
+                    )[0]
+                    pdf_file = generate_detection_report(
+                        filename=file_name,
+                        prediction=prediction,
+                        confidence=confidence,
+                        probability_fake=fake_probability,
+                        probability_real=real_probability,
+                        threshold=threshold,
+                        risk=risk,
+                        features=features,
+                        waveform_path=waveform_path,
+                        spectrogram_path=spectrogram_path,
+                    )
+                    st.download_button(
+                        label="📥 Download Detection Report",
+                        data=pdf_file,
+                        file_name=(
+                            f"deepfake_detection_"
+                            f"{base_filename}.pdf"
+                        ),
+                        mime="application/pdf",
+                    )
         finally:
 
             # -------------------------------------------------
